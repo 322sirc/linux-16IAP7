@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux-16IAP7
-pkgver=5.18.14.arch1
+pkgver=5.19.arch1
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -18,7 +18,13 @@ _srcname=archlinux-linux
 source=(
   "$_srcname::git+https://github.com/archlinux/linux?signed#tag=$_srctag"
    config         # the main kernel config file
-   bottomspeakers-16IAP7.patch
+   '0001-ALSA-hda-realtek-Add-quirk-for-Lenovo-Yoga9-14IAP7.patch'
+  '0002-ACPICA-Make-address-space-handler-install-and-_REG-e.patch'
+  '0003-ACPI-EC-fix-ECDT-probe-ordering-issues.patch'
+  '0004-Add-IdeaPad-WMI-Fn-Keys-driver.patch'
+  '0005-Add-IdeaPad-Usage-Mode-driver.patch'
+  '0006-Add-IdeaPad-quick_charge-attribute-to-sysfs.patch'
+  '0007-ALSA-hda-realtek-Add-quirk-for-Yoga-devices.patch'
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
@@ -27,8 +33,14 @@ validpgpkeys=(
   'C7E7849466FE2358343588377258734B41C31549'  # David Runge <dvzrv@archlinux.org>
 )
 sha256sums=('SKIP'
-            '870c3a8caec2cdd39320e1f4e91339571229f43ebc711892ca4d4b5bd5701dd5'
-            '930b124d5e28074b70973132e75ec151b87c7b9497953bb93722392352491f1b')
+            'd688809b499f703418efba9f188de6da29c030c2c8f7ec5fbc681d1f66674025'
+            'f2ec03ff889d23ad3af512fbe83a856985e4bd45092f9239897d10c49ec16385'
+            '06cad2a429f2a694f55300a5153483f9883ae5cfb8f8223ed2821a944e6ea4a4'
+            '43e0a20d037015742373f19def6f31710dd35a8ee0e121a97c29b2a57080b801'
+            'c6f778d786fbdd3483c66d834321c788b2818828003862d5a2a12f4cbc1694e6'
+            'c9420129ecdbdfaf3b2006923763d1291f9031f26911219910593b33b621e18d'
+            'c5ade2a167b1337e5564e49f9bec135d40b30b2442174598c354d80580a0af4e'
+            '3e00356005c55f34c753bc7c6ee0eeae7ad6ba1675edf141f50e775125400972')
  
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
