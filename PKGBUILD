@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux-16IAP7
-pkgver=5.19.arch1
+pkgver=5.19.2-arch1
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -18,7 +18,7 @@ _srcname=archlinux-linux
 source=(
   "$_srcname::git+https://github.com/archlinux/linux?signed#tag=$_srctag"
    config         # the main kernel config file
-   '0001-ALSA-hda-realtek-Add-quirk-for-Lenovo-Yoga9-14IAP7.patch'
+   '0001-PCI-DPC-Quirk-poot-port-PIO-log-size-for-certain-Int.patch'
   '0002-ACPICA-Make-address-space-handler-install-and-_REG-e.patch'
   '0003-ACPI-EC-fix-ECDT-probe-ordering-issues.patch'
   '0004-Add-IdeaPad-WMI-Fn-Keys-driver.patch'
