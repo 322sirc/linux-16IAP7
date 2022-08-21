@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux-16IAP7
-pkgver=5.19.2-arch1
+pkgver=5.19.3.arch1
 pkgrel=1
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -18,13 +18,15 @@ _srcname=archlinux-linux
 source=(
   "$_srcname::git+https://github.com/archlinux/linux?signed#tag=$_srctag"
    config         # the main kernel config file
-   '0001-PCI-DPC-Quirk-poot-port-PIO-log-size-for-certain-Int.patch'
+  '0001-PCI-DPC-Quirk-poot-port-PIO-log-size-for-certain-Int.patch'
   '0002-ACPICA-Make-address-space-handler-install-and-_REG-e.patch'
   '0003-ACPI-EC-fix-ECDT-probe-ordering-issues.patch'
   '0004-Add-IdeaPad-WMI-Fn-Keys-driver.patch'
   '0005-Add-IdeaPad-Usage-Mode-driver.patch'
   '0006-Add-IdeaPad-quick_charge-attribute-to-sysfs.patch'
   '0007-ALSA-hda-realtek-Add-quirk-for-Yoga-devices.patch'
+  '0008-HID-hid-sensor-custom-More-custom-iio-sensors.patch'
+  '0009-IIO-hid-sensor-als-Use-generic-usage.patch'
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
@@ -33,14 +35,16 @@ validpgpkeys=(
   'C7E7849466FE2358343588377258734B41C31549'  # David Runge <dvzrv@archlinux.org>
 )
 sha256sums=('SKIP'
-            'd688809b499f703418efba9f188de6da29c030c2c8f7ec5fbc681d1f66674025'
-            'f2ec03ff889d23ad3af512fbe83a856985e4bd45092f9239897d10c49ec16385'
+            '2a1456028c22ab33b02d1a501b39e15c6ea00bcef0c4ebc972c4ea98eb5251a7'
+            'b19a23d37f3c74aa928c5d577f4fb41f115dbe1acdc3f6383ac9a53c15dbcf71'
             '06cad2a429f2a694f55300a5153483f9883ae5cfb8f8223ed2821a944e6ea4a4'
             '43e0a20d037015742373f19def6f31710dd35a8ee0e121a97c29b2a57080b801'
             'c6f778d786fbdd3483c66d834321c788b2818828003862d5a2a12f4cbc1694e6'
             'c9420129ecdbdfaf3b2006923763d1291f9031f26911219910593b33b621e18d'
             'c5ade2a167b1337e5564e49f9bec135d40b30b2442174598c354d80580a0af4e'
-            '3e00356005c55f34c753bc7c6ee0eeae7ad6ba1675edf141f50e775125400972')
+            '4ccf87491541cd991fbb2cf05f87fd08ddb885144f7c3bc04fe16e406327b136'
+            'd1b2c9c17b0c193d3df1184d0f7fc850daf9e3d84d1d34385c8a9ee10a6ae17c'
+            '7ff6d9c2da686f3331c117d2f06f6aa9f37be5ac95eb781b54491e0ece517a8a')
  
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
@@ -63,6 +67,44 @@ prepare() {
     patch -Np1 < "../$src"
   done
 
+  msg2 "Disable NUMA..."
+  scripts/config --disable CONFIG_NUMA
+  
+  msg2 "Disable old dynticks..."
+  scripts/config --disable CONFIG_NO_HZ
+
+msg2 "Set tick rate to 1000HZ..."
+  scripts/config --disable CONFIG_HZ_300
+  scripts/config --enable CONFIG_HZ_1000
+  scripts/config --set-val CONFIG_HZ 1000
+
+
+msg2 "Set up a GCC -O3 optimized kernel..."
+  scripts/config --disable CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+  scripts/config --enable CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
+
+msg2 "Set default CPU governor to performance..."
+  scripts/config --disable CONFIG_CPU_FREQ_DEFAULT_GOV_SCHEDUTIL
+  scripts/config --disable CONFIG_CPU_FREQ_DEFAULT_GOV_POWERSAVE
+  scripts/config --disable CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE
+  scripts/config --enable CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE
+
+
+msg2 "Disable kernel debugging for smaller builds..."
+  scripts/config --disable CONFIG_CONTEXT_TRACKING
+  scripts/config --disable CONFIG_CONTEXT_TRACKING_FORCE
+  scripts/config --disable CONFIG_DEBUG_KERNEL
+  scripts/config --disable CONFIG_DEBUG_INFO
+  scripts/config --disable CONFIG_ENABLE_MUST_CHECK
+  scripts/config --disable CONFIG_UNUSED_SYMBOLS
+  scripts/config --disable CONFIG_DEBUG_FS
+  scripts/config --disable CONFIG_DEBUG_SECTION_MISMATCH
+  scripts/config --disable CONFIG_DEBUG_FORCE_WEAK_PER_CPU
+  scripts/config --disable CONFIG_DEBUG_MEMORY_INIT
+  scripts/config --disable CONFIG_KGDB
+  scripts/config --disable CONFIG_FUNCTION_TRACER
+  scripts/config --disable CONFIG_STACK_TRACER
+  
   echo "Setting config..."
   cp ../config .config
   make olddefconfig
